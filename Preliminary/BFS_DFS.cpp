@@ -15,7 +15,6 @@ int pathTaken[MAZE_ROWS][MAZE_COLS];
 
 using namespace std;
 
-// Custom implementation of a queue
 struct Queue
 {
     struct Point
