@@ -40,7 +40,6 @@ struct Queue
     }
 };
 
-// Implementation of a stack
 struct Stack
 {
     struct Point
