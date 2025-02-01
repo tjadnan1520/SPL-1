@@ -65,7 +65,6 @@ struct Stack
     }
 };
 
-// Function prototypes
 void generateMaze();
 void saveMaze(const char *filename);
 void loadMaze(const char *filename);
