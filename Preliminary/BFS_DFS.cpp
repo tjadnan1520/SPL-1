@@ -186,7 +186,6 @@ int main()
     return 0;
 }
 
-// Function to generate a random maze
 void generateMaze()
 {
     srand(time(0));
