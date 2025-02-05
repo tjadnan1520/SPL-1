@@ -1,209 +1,158 @@
-#include <bits/stdc++.h>
+ #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <conio.h>  
 #include <graphics.h>
-#include <stack>
-#include <ctime>
-#include <conio.h>
-#include <cstring>
-#include <cstdio>
-#include <cmath>
 
-using namespace std;
+#define ROWS 16
+#define COLS 21
+#define CELL_SIZE 30
 
-#define MAZE_ROWS_of_Astar 16
-#define MAZE_COLS_of_Astar 21
-#define CELL_SIZE_of_Astar 30
+typedef struct {
+    int x, y;   
+    int g;      
+    int h;      
+    int f;      
+} Node;
 
-int mazeLayoutOfA_star[MAZE_ROWS_of_Astar][MAZE_COLS_of_Astar] =
-    {
-        {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
-        {1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1},
-        {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1},
-        {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1},
-        {1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1},
-        {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
-        {1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1},
-        {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1},
-        {1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-        {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
-        {1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1},
-        {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1},
-};
 
-int goalFoundofAstar = 0;
-int pathTakenofAstar[MAZE_ROWS_of_Astar][MAZE_COLS_of_Astar];
-int distanceofAstar[MAZE_ROWS_of_Astar][MAZE_COLS_of_Astar];
-
-// Function to render the maze
-void renderMazeOfAstar()
-{
-    for (int i = 0; i < MAZE_ROWS_of_Astar; i++)
-    {
-        for (int j = 0; j < MAZE_COLS_of_Astar; j++)
-        {
-            int xCoord = j * CELL_SIZE_of_Astar;
-            int yCoord = i * CELL_SIZE_of_Astar;
-
-            if (mazeLayoutOfA_star[i][j] == 1)
-            {
-                rectangle(xCoord, yCoord, xCoord + CELL_SIZE_of_Astar, yCoord + CELL_SIZE_of_Astar);
-            }
-            else if (mazeLayoutOfA_star[i][j] == 2)
-            {
-                circle(xCoord + CELL_SIZE_of_Astar / 2, yCoord + CELL_SIZE_of_Astar / 2, CELL_SIZE_of_Astar / 3);
-            }
-        }
-    }
+int calculateManhattanDistance(int x1, int y1, int x2, int y2) {
+    return abs(x1 - x2) + abs(y1 - y2);
 }
 
-void customDelayOfAstar(int milliseconds)
-{
-    int end_time = clock() + milliseconds;
-    while (clock() < end_time) {}
+
+bool isValidCell(int x, int y) {
+    return (x >= 0 && x < ROWS && y >= 0 && y < COLS);
 }
 
-void drawPathOnMazebyAstar()
-{
-    for (int i = 0; i < MAZE_ROWS_of_Astar; i++)
-    {
-        for (int j = 0; j < MAZE_COLS_of_Astar; j++)
-        {
-            if (pathTakenofAstar[i][j] == 1)
-            {
-                setfillstyle(SOLID_FILL, CYAN);
-                bar(j * CELL_SIZE_of_Astar + CELL_SIZE_of_Astar / 6, i * CELL_SIZE_of_Astar + CELL_SIZE_of_Astar / 6,
-                    (j + 1) * CELL_SIZE_of_Astar - CELL_SIZE_of_Astar / 6, (i + 1) * CELL_SIZE_of_Astar - CELL_SIZE_of_Astar / 6);
-            }
-        }
-    }
+// Function to draw a rectangle for a cell
+void drawCell(int x, int y, int color) {
+    setfillstyle(SOLID_FILL, color);
+    bar(x * CELL_SIZE, y * CELL_SIZE, (x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE);
 }
 
-// Heuristic function for A* algorithm
-int calculateHeuristic(int x, int y, int endX, int endY)
-{
-    // Euclidean distance heuristic
-    return static_cast<int>(sqrt((x - endX) * (x - endX) + (y - endY) * (y - endY)));
-}
 
-void aStar(int startX, int startY, int endX, int endY)
-{
-    const int INF = INT_MAX;
-    int dx[] = {1, -1, 0, 0};
-    int dy[] = {0, 0, 1, -1};
-
-    for (int i = 0; i < MAZE_ROWS_of_Astar; i++)
-    {
-        for (int j = 0; j < MAZE_COLS_of_Astar; j++)
-        {
-            ::distanceofAstar[i][j] = INF;
-            pathTakenofAstar[i][j] = 0;
-        }
-    }
-
-    ::distanceofAstar[startX][startY] = 0;
-
-    priority_queue<pair<int, pair<int, int> >, vector<pair<int, pair<int, int> > >, greater<pair<int, pair<int, int> > > > pq;
-    pq.push({calculateHeuristic(startX, startY, endX, endY), {startX, startY}});
-
-    while (!pq.empty())
-    {
-        int x = pq.top().second.first;
-        int y = pq.top().second.second;
-        pq.pop();
-
-        pathTakenofAstar[x][y] = 1;
-
-        if (x == endX && y == endY)
-        {
-            goalFoundofAstar = 1;
-            break;
-        }
-
-        for (int i = 0; i < 4; i++)
-        {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-
-            if (nx >= 0 && nx < MAZE_ROWS_of_Astar && ny >= 0 && ny < MAZE_COLS_of_Astar && !pathTakenofAstar[nx][ny] && mazeLayoutOfA_star[nx][ny] != 1)
-            {
-                int newDist = ::distanceofAstar[x][y] + 1;
-                if (newDist < ::distanceofAstar[nx][ny])
-                {
-                    ::distanceofAstar[nx][ny] = newDist;
-                    pq.push({newDist + calculateHeuristic(nx, ny, endX, endY), {nx, ny}});
-                    customDelayOfAstar(100);
-
-                    cleardevice();
-                    renderMazeOfAstar();
-                    drawPathOnMazebyAstar();
-                }
-            }
-        }
-    }
-}
-
-void A_Star()
-{
-    int startingRow = 0;
-    int startingCol = 0;
-
+bool aStar(int grid[ROWS][COLS], Node start, Node goal) {
+    
     char data[] = "C:\\MinGW\\lib\\libbgi.a";
 
     int graphicsDriver = DETECT, graphicsMode;
     initgraph(&graphicsDriver, &graphicsMode, data);
 
-    // Initially, display a black screen
-    cleardevice();
+    
+    Node openList[ROWS * COLS];
+    Node closedList[ROWS * COLS];
 
-    outtextxy(10, 50,(char*) "Hit the Button to solve the Maze");
+    int openCount = 0;
+    int closedCount = 0;
 
-    rectangle(10, 80, 275, 115);
-    outtextxy(20, 90, (char*)"1. Solve Maze by A* Algorithm");
+    
+    openList[openCount++] = start;
 
-    int x, y;
+    while (openCount > 0) {
+        int currentIndex = 0;
+        for (int i = 1; i < openCount; i++) {
+            if (openList[i].f < openList[currentIndex].f) {
+                currentIndex = i;
+            }
+        }
 
-    //cout << "Enter Starting Row and Column: ";
-    //cin >> startingRow;
-    //cin >> startingCol;
+        
+        Node current = openList[currentIndex];
+        openCount--;
+        for (int i = currentIndex; i < openCount; i++) {
+            openList[i] = openList[i + 1];
+        }
 
-    while (true)
-    {
-        if (ismouseclick(WM_LBUTTONDOWN))
-        {
-            getmouseclick(WM_LBUTTONDOWN, x, y);
+        
+        grid[current.x][current.y] = 2;
 
-            if (x >= 10 && x <= 275 && y >= 20 && y <= 115)
-            {
-                goalFoundofAstar = 0;
-                cleardevice();
-                renderMazeOfAstar();
-                aStar(startingRow, startingCol, 15, 15);
+        
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                if (grid[i][j] == 1) {
+                    drawCell(i, j, BLACK);  
+                } else if (grid[i][j] == 2) {
+                    drawCell(i, j, LIGHTGREEN);  
+                } else {
+                    drawCell(i, j, WHITE);  
+                }
+            }
+        }
 
-                if (goalFoundofAstar)
-                {
-                    cout << "Path to reach the goal: " << endl;
-                    for (int i = 0; i < MAZE_ROWS_of_Astar; i++)
-                    {
-                        for (int j = 0; j < MAZE_COLS_of_Astar; j++)
-                        {
-                            if (pathTakenofAstar[i][j] == 1)
-                            {
-                                cout << "-> [" << i << "," << j << "] ";
-                            }
-                        }
+            delay(100);
+
+        
+        if (current.x == goal.x && current.y == goal.y) {
+            closegraph();
+            return true;
+        }
+
+       
+        int dx[] = {0, 1, 0, -1};
+        int dy[] = {-1, 0, 1, 0};
+        for (int i = 0; i < 4; i++) {
+            int newX = current.x + dx[i];
+            int newY = current.y + dy[i];
+
+            
+            if (isValidCell(newX, newY) && grid[newX][newY] != 1) {
+                Node neighbor;
+                neighbor.x = newX;
+                neighbor.y = newY;
+                neighbor.g = current.g + 1;
+                neighbor.h = calculateManhattanDistance(newX, newY, goal.x, goal.y);
+                neighbor.f = neighbor.g + neighbor.h;
+
+                
+                bool inOpenList = false;
+                for (int j = 0; j < openCount; j++) {
+                    if (openList[j].x == neighbor.x && openList[j].y == neighbor.y && openList[j].f <= neighbor.f) {
+                        inOpenList = true;
+                        break;
                     }
                 }
-                else
-                {
-                    cout << "Path to the goal not found!";
+
+                
+                if (!inOpenList) {
+                    openList[openCount++] = neighbor;
                 }
             }
         }
     }
 
-    getch();
     closegraph();
+    printf("Path not found!\n");
+    return false;
+}
+
+int main() {
+    int grid[ROWS][COLS] = {
+    {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    {0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1},
+    {1,0,1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1},
+    {1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,1,1,0,1,0,1},
+    {1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1},
+    {1,0,0,0,1,1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1},
+    {1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,1,1},
+    {1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1},
+    {1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1},
+    {1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1},
+    {1,0,1,0,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,0,1},
+    {1,0,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,1,1,0,1},
+    {1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1},
+    {1,0,1,0,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,0,1},
+    {1,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,1,1,1,0,1},
+    {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1}
+    };
+
+    Node start = {0, 0, 0, 0, 0};
+    Node goal = {15, 15, 0, 0, 0};
+
+    if (aStar(grid, start, goal)) {
+        printf("Path found!\n");
+    }
+
+    getch();  
+    return 0;    ;
 }
