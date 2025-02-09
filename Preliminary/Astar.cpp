@@ -24,8 +24,6 @@ int calculateManhattanDistance(int x1, int y1, int x2, int y2) {
 bool isValidCell(int x, int y) {
     return (x >= 0 && x < ROWS && y >= 0 && y < COLS);
 }
-
-// Function to draw a rectangle for a cell
 void drawCell(int x, int y, int color) {
     setfillstyle(SOLID_FILL, color);
     bar(x * CELL_SIZE, y * CELL_SIZE, (x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE);
