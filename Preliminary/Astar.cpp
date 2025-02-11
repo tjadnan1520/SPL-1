@@ -150,7 +150,6 @@ int main() {
     if (aStar(grid, start, goal)) {
         printf("Path found!\n");
     }
-
     getch();  
     return 0;    ;
 }
