@@ -14,8 +14,6 @@ int goalFound = 0;
 int pathTaken[MAZE_ROWS][MAZE_COLS];
 
 using namespace std;
-
-// Add before PlayerStats structure
 struct Point {
     int x, y;
     Point(int _x = -1, int _y = -1) : x(_x), y(_y) {}
