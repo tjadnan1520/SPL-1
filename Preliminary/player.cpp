@@ -18,8 +18,6 @@ struct Point {
     int x, y;
     Point(int _x = -1, int _y = -1) : x(_x), y(_y) {}
 };
-
-// Add new global variables
 struct PlayerStats {
     int steps;
     clock_t startTime;
