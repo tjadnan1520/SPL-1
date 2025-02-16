@@ -29,7 +29,6 @@ struct PlayerStats {
     bool timeExpired;
 } player;
 
-// Add new color definitions and constants
 #define PLAYER_COLOR YELLOW
 #define VISITED_PATH LIGHTMAGENTA
 #define SUCCESS_COLOR LIGHTGREEN
