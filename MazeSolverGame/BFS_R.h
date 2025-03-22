@@ -1,6 +1,5 @@
 #ifndef BFS_R_H 
 #define BFS_R_H
-
 #include <iostream>
 #include <graphics.h>
 #include <ctime>
@@ -17,4 +16,5 @@ void customDelay(int milliseconds);
 void drawPathOnMaze();
 void bfsSolveMaze(int startX, int startY);
 void bfsExploreMaze(int startX, int startY);
+
 #endif
