@@ -34,7 +34,7 @@ int pathTaken[MAZE_ROWS][MAZE_COLS];
 
 using namespace std;
 
-// Stack Implementation
+
 struct Point
 {
     int x, y;
