@@ -14,7 +14,6 @@ int goalFound = 0;
 int pathTaken[MAZE_ROWS][MAZE_COLS];
 
 using namespace std;
-// Implementation of a stack
 struct Stack
 {
     struct Point
